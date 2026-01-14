@@ -1,0 +1,5 @@
+{
+  "scripts": {
+    "test": "echo \"No tests configured. Add tests for this stage.\" && exit 0"
+  }
+}
