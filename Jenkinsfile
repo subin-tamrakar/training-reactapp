@@ -31,7 +31,7 @@ pipeline {
       stage ("archive stage"){
          steps {
            echo "archiving"
-           archiveArifacts artifacts: "dist/*", fingerprint: true
+           archiveArtifacts artifacts: "dist/*", fingerprint: true
            }
         }
       stage ("deploy stage"){
