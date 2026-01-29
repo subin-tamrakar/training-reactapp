@@ -1,0 +1,23 @@
+on:
+  push:
+    branches:
+      - main
+
+
+jobs:
+  build-node-artifacts:
+    runs-on: ubuntu-latest
+    steps:
+    - run: echo "Hello Github Actions"
+    - name: Checkout
+      uses: actions/checkout@v6.0.2
+    - name: Setup Node.js environment
+      uses: actions/setup-node@v6.2.0
+      with:
+        node-version: 20.0.0
+        cache: npm
+        run: npm install
+    - name: Test
+      run: npm test
+    - name: Buildng
+      run : npm run build
