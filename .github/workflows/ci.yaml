@@ -35,8 +35,11 @@ jobs:
         uses: actions/download-artifact@v7.0.0
         with:
           name: dist
+      - name: list contents of folder
+        run: ls -al
           
           
+
 
 
 
