@@ -27,5 +27,11 @@ jobs:
         name: dist
         path: dist/
         retention-days: 1
+  deploy-inaws:
+    needs: build-node-artifacts
+    runs-on: ubuntu-latest
+    steps:
+      - 
         
+
 
