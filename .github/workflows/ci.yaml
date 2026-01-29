@@ -1,72 +1,49 @@
-name: Node CI Pipeline
-
 on:
   push:
     branches:
       - main
 
+
 jobs:
   build-node-artifacts:
     runs-on: ubuntu-latest
-
     steps:
-      - name: Checkout source code
-        uses: actions/checkout@v4
-
-      - name: Setup Node.js
-        uses: actions/setup-node@v4
-        with:
-          node-version: 20
-          cache: npm
-
-      - name: Install dependencies
-        run: npm install
-
-      - name: Run tests
-        run: npm test
-
-      - name: Build application
-        run: npm run build
-
-      - name: Verify build output
-        run: |
-          test -d dist || (echo "dist/ directory not found" && exit 1)
-          ls -al dist
-
-      - name: Upload build artifact
-        uses: actions/upload-artifact@v4
-        with:
-          name: dist
-          path: dist
-          retention-days: 1
-
-  deploy:
+    - run: echo "Hello Github Actions"
+    - name: Checkout
+      uses: actions/checkout@v6.0.2
+    - name: Setup Node.js environment
+      uses: actions/setup-node@v6.2.0
+      with:
+        node-version: 20.0.0
+        cache: npm
+    - run: npm install
+    - name: Test
+      run: npm test
+    - name: Buildng
+      run : npm run build
+    - name: Upload a Build Artifact
+      uses: actions/upload-artifact@v6.0.0
+      with:
+        name: dist
+        path: dist/
+        retention-days: 1
+  deploy-inaws:
     needs: build-node-artifacts
     runs-on: ubuntu-latest
-
     steps:
-      - name: Download build artifact
-        uses: actions/download-artifact@v4
+      - name: Download a Build Artifact
+        uses: actions/download-artifact@v7.0.0
         with:
           name: dist
-          path: dist
+          path: dist/
+      - name: list contents of folder
+        run: ls -al
+      - name: Login to ssh server
+        run: ssh -i $SSH_KEY $SSH_USER@SERVER_ID ls
+          
+          
 
-      - name: Verify downloaded artifact
-        run: ls -al dist
 
-      - name: Validate required secrets
-        run: |
-          [ -z "${{ secrets.SSH_KEY }}" ] && echo "SSH_KEY missing" && exit 1
-          [ -z "${{ secrets.SSH_USER }}" ] && echo "SSH_USER missing" && exit 1
-          [ -z "${{ secrets.SERVER_ID }}" ] && echo "SERVER_ID missing" && exit 1
 
-      - name: Setup SSH key
-        run: |
-          mkdir -p ~/.ssh
-          echo "${{ secrets.SSH_KEY }}" > ~/.ssh/id_rsa
-          chmod 600 ~/.ssh/id_rsa
-          ssh-keyscan -H "${{ secrets.SERVER_ID }}" >> ~/.ssh/known_hosts
 
-      - name: Deploy to server
-        run: |
-          ssh "${{ secrets.SSH_USER }}@${{ secrets.SERVER_ID }}" "ls -al"
+
