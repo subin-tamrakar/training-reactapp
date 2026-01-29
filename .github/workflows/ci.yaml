@@ -16,8 +16,9 @@ jobs:
       with:
         node-version: 20.0.0
         cache: npm
-        run: npm install
+    - run: npm install
     - name: Test
       run: npm test
     - name: Buildng
       run : npm run build
+
