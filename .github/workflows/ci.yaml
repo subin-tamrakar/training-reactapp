@@ -29,7 +29,9 @@ jobs:
         run: npm run build
 
       - name: Verify build output
-        run: ls -al dist
+        run: |
+          test -d dist || (echo "dist/ not found" && exit 1)
+          ls -al dist
 
       - name: Upload build artifact
         uses: actions/upload-artifact@v4
@@ -52,13 +54,19 @@ jobs:
       - name: Verify downloaded artifact
         run: ls -al dist
 
+      - name: Validate required secrets
+        run: |
+          [ -z "${{ secrets.SSH_PRIVATE_KEY }}" ] && echo "SSH_PRIVATE_KEY missing" && exit 1
+          [ -z "${{ secrets.SSH_USER }}" ] && echo "SSH_USER missing" && exit 1
+          [ -z "${{ secrets.SERVER_HOST }}" ] && echo "SERVER_HOST missing" && exit 1
+
       - name: Setup SSH key
         run: |
           mkdir -p ~/.ssh
           echo "${{ secrets.SSH_PRIVATE_KEY }}" > ~/.ssh/id_rsa
           chmod 600 ~/.ssh/id_rsa
-          ssh-keyscan -H ${{ secrets.SERVER_HOST }} >> ~/.ssh/known_hosts
+          ssh-keyscan -H "${{ secrets.SERVER_HOST }}" >> ~/.ssh/known_hosts
 
       - name: Deploy to server
         run: |
-          ssh ${{ secrets.SSH_USER }}@${{ secrets.SERVER_HOST }} "ls -al"
+          ssh "${{ secrets.SSH_USER }}@${{ secrets.SERVER_HOST }}" "ls -al"
